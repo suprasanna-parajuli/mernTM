@@ -7,6 +7,19 @@ import Dashboard from "./pages/dashboard";
 import PendingPage from "./pages/PendingPage";
 import CompletePage from "./pages/CompletePage";
 import Profile from "./components/Profile";
+import Subjects from "./pages/Subjects";
+import Materials from "./pages/Materials";
+import Schedule from "./pages/Schedule";
+import Analytics from "./pages/Analytics";
+import AIInsights from "./pages/AIInsights";
+
+function ProtectedLayout({ user, onLogout }) {
+  return (
+    <Layout user={user} onLogout={onLogout}>
+      <Outlet />
+    </Layout>
+  );
+}
 
 const App = () => {
   const navigate = useNavigate();
@@ -39,14 +52,6 @@ const App = () => {
     navigate("/login", { replace: true });
   };
 
-  const ProtectedLayout = () => {
-    return (
-      <Layout user={currentUser} onLogout={handleLogout}>
-        <Outlet />
-      </Layout>
-    );
-  };
-
   return (
     <Routes>
       <Route
@@ -74,12 +79,17 @@ const App = () => {
       <Route
         path="/"
         element={
-          currentUser ? <ProtectedLayout /> : <Navigate to="/login" replace />
+          currentUser ? <ProtectedLayout user={currentUser} onLogout={handleLogout} /> : <Navigate to="/login" replace />
         }
       >
         <Route path="/" element={<Dashboard />} />
         <Route path="/pending" element={<PendingPage />} />
         <Route path="/complete" element={<CompletePage />} />
+        <Route path="/subjects" element={<Subjects onLogout={handleLogout} />} />
+        <Route path="/materials" element={<Materials onLogout={handleLogout} />} />
+        <Route path="/schedule" element={<Schedule onLogout={handleLogout} />} />
+        <Route path="/analytics" element={<Analytics onLogout={handleLogout} />} />
+        <Route path="/ai-insights" element={<AIInsights onLogout={handleLogout} />} />
         <Route
           path="/profile"
           element={

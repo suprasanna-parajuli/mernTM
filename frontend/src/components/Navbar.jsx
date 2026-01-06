@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import StreakDisplay from "./StreakDisplay";
+import NotificationCenter from "./NotificationCenter";
 
 const Navbar = ({ user = {}, onLogout }) => {
   const menuref = useRef(null);
@@ -44,11 +46,17 @@ const Navbar = ({ user = {}, onLogout }) => {
           </div>
           {/* BRAND NAME */}
           <span className="text-2xl font-extrabold bg-gradient-to-r from-fuchsia-500 via-purple-500 to-indigo-500 bg-clip-text text-transparent tracking-wide">
-            TaskFlow
+            CourseCraft
           </span>
         </div>
         {/* RIGHT SIDE  */}
         <div className="flex items-center gap-4">
+          {/* Streak Display */}
+          <StreakDisplay onLogout={onLogout} />
+
+          {/* Notification Bell */}
+          <NotificationCenter onLogout={onLogout} />
+
           <button
             className="p-2 text-gray-600 hover:text-purple-500 transition-colors duration-300 hover:bg-purple-50 rounded-full"
             onClick={() => navigate("/profile")}

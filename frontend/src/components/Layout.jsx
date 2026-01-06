@@ -1,14 +1,22 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import axios from "axios";
 import { TrendingUp, Circle, Zap, Clock } from "lucide-react";
+import { useTimer } from "../contexts/TimerContext";
+import FloatingTimer from "./FloatingTimer";
 
 const Layout = ({ onLogout, user }) => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isStudying } = useTimer();
+  const location = useLocation();
+
+  // Pages that should NOT show the right sidebar
+  const hideRightSidebarPaths = ["/schedule", "/subjects", "/materials", "/analytics", "/ai-insights"];
+  const shouldHideRightSidebar = hideRightSidebarPaths.includes(location.pathname);
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
@@ -116,12 +124,17 @@ const Layout = ({ onLogout, user }) => {
       <Sidebar user={user} tasks={tasks} />
 
       <div className="ml-0 xl:ml-64 lg:ml-64 md:ml-16 pt-16 p-3 sm:p-4 md:p-3 transition-all duration-300">
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-          <div className="xl:col-span-2 space-y-3 sm:space-y-4">
+        {shouldHideRightSidebar ? (
+          <div className="space-y-3 sm:space-y-4">
             <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
           </div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="xl:col-span-2 space-y-3 sm:space-y-4">
+              <Outlet context={{ tasks, refreshTasks: fetchTasks }} />
+            </div>
 
-          <div className="xl:col-span-1 space-y-4 sm:space-y-6">
+            <div className="xl:col-span-1 space-y-4 sm:space-y-6">
             <div className="bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-purple-100">
               <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-gray-800 flex items-center gap-2">
                 <TrendingUp className="size-4 sm:size-5 text-purple-500" />
@@ -225,9 +238,13 @@ const Layout = ({ onLogout, user }) => {
                 )}
               </div>
             </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Floating Timer Widget - Visible globally when studying */}
+      {isStudying && <FloatingTimer onRefresh={fetchTasks} />}
     </div>
   );
 };

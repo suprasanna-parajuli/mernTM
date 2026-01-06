@@ -59,6 +59,18 @@ const TaskItem = ({
     : 0;
 
   const handleComplete = async () => {
+    // If this is a subject (not a real task), don't allow completion via checkbox
+    if (task.isSubject) {
+      alert("This is an exam preparation task. Go to the Subjects page to manage it.");
+      return;
+    }
+
+    // If this is a material (not a real task), don't allow completion via checkbox
+    if (task.isMaterial) {
+      alert("This is a study material task. Go to the Materials page to track progress.");
+      return;
+    }
+
     const newStatus = isCompleted ? "No" : "Yes";
     try {
       await axios.put(
@@ -76,11 +88,35 @@ const TaskItem = ({
 
   const handleAction = (action) => {
     setShowMenu(false);
+
+    // Prevent editing/deleting subjects (they should be managed in Subjects page)
+    if (task.isSubject) {
+      alert("This is an exam preparation task from your Subjects. Manage it in the Subjects page.");
+      return;
+    }
+
+    // Prevent editing/deleting materials (they should be managed in Materials page)
+    if (task.isMaterial) {
+      alert("This is a study material task. Manage it in the Materials page.");
+      return;
+    }
+
     if (action === "edit") setShowEditModal(true);
     if (action === "delete") handleDelete();
   };
 
   const handleDelete = async () => {
+    // Extra safety check
+    if (task.isSubject) {
+      alert("Cannot delete exam preparation tasks. Manage subjects in the Subjects page.");
+      return;
+    }
+
+    if (task.isMaterial) {
+      alert("Cannot delete study material tasks. Manage materials in the Materials page.");
+      return;
+    }
+
     try {
       await axios.delete(`${API_BASE}/${task._id}/gp`, {
         headers: getAuthHeaders(),
@@ -92,6 +128,17 @@ const TaskItem = ({
   };
 
   const handleSave = async (updateTask) => {
+    // Extra safety check
+    if (task.isSubject) {
+      alert("Cannot edit exam preparation tasks here. Use the Subjects page.");
+      return;
+    }
+
+    if (task.isMaterial) {
+      alert("Cannot edit study material tasks here. Use the Materials page.");
+      return;
+    }
+
     try {
       const payload = (({
         title,
@@ -114,7 +161,7 @@ const TaskItem = ({
     <>
       <div className={`${TI_CLASSES.wrapper} ${borderColor}`}>
         <div className={TI_CLASSES.leftContainer}>
-          {showCompleteCheckbox && (
+          {showCompleteCheckbox && !task.isSubject && !task.isMaterial && (
             <button
               onClick={handleComplete}
               className={`${TI_CLASSES.completeBtn} ${isCompleted ? "text-green-500" : "text-gray-300"}`}
@@ -145,28 +192,30 @@ const TaskItem = ({
           </div>
         </div>
         <div className={TI_CLASSES.rightContainer}>
-          <div className="relative ">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className={TI_CLASSES.menuButton}
-            >
-              <MoreVertical className="size-4 sm:size-5" size={18} />
-            </button>
-            {showMenu && (
-              <div className={TI_CLASSES.menuDropdown}>
-                {MENU_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.action}
-                    onClick={() => handleAction(opt.action)}
-                    className="wfull px-3 sm:px-4 py-2 text-left text-xs sm:text-sm hover:bg-purple-50 flex items-center gap-2 transition-colors duration-200"
-                  >
-                    {opt.icon}
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {!task.isSubject && !task.isMaterial && (
+            <div className="relative ">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className={TI_CLASSES.menuButton}
+              >
+                <MoreVertical className="size-4 sm:size-5" size={18} />
+              </button>
+              {showMenu && (
+                <div className={TI_CLASSES.menuDropdown}>
+                  {MENU_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.action}
+                      onClick={() => handleAction(opt.action)}
+                      className="wfull px-3 sm:px-4 py-2 text-left text-xs sm:text-sm hover:bg-purple-50 flex items-center gap-2 transition-colors duration-200"
+                    >
+                      {opt.icon}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           <div>
             <div
               className={`${TI_CLASSES.dateRow} ${task.dueDate && isToday(new Date(task.dueDate)) ? "text-fuchsia-600" : "text-gray-500"}`}

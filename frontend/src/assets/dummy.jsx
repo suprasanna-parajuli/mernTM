@@ -15,6 +15,8 @@ import {
   MoreVertical,
   Clock,
   Calendar,
+  BarChart3,
+  Brain,
 } from "lucide-react";
 
 // BACKEND TEST
@@ -113,6 +115,31 @@ export const menuItems = [
     text: "Completed Tasks",
     path: "/complete",
     icon: <CheckCircle2 className="w-5 h-5" />,
+  },
+  {
+    text: "My Subjects",
+    path: "/subjects",
+    icon: <Home className="w-5 h-5" />,
+  },
+  {
+    text: "Study Materials",
+    path: "/materials",
+    icon: <Home className="w-5 h-5" />,
+  },
+  {
+    text: "Weekly Schedule",
+    path: "/schedule",
+    icon: <Calendar className="w-5 h-5" />,
+  },
+  {
+    text: "Analytics",
+    path: "/analytics",
+    icon: <BarChart3 className="w-5 h-5" />,
+  },
+  {
+    text: "AI Assistant",
+    path: "/ai-insights",
+    icon: <Brain className="w-5 h-5" />,
   },
 ];
 
